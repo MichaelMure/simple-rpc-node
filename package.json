@@ -1,0 +1,28 @@
+{
+  "name": "simple-rpc-node",
+  "version": "1.0.0",
+  "description": "A really simple and fast binary RPC middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meteorhacks/simple-rpc-node.git"
+  },
+  "keywords": [
+    "simple",
+    "binary",
+    "rpc"
+  ],
+  "author": "Meteorhacks",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meteorhacks/simple-rpc-node/issues"
+  },
+  "homepage": "https://github.com/meteorhacks/simple-rpc-node#readme",
+  "dependencies": {
+    "node-int64": "^0.4.0",
+    "protobufjs": "^4.0.0"
+  }
+}
