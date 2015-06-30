@@ -1,5 +1,5 @@
 {
-  "name": "simple-rpc-node",
+  "name": "simple-rpc",
   "version": "1.0.0",
   "description": "A really simple and fast binary RPC middleware",
   "main": "index.js",
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/meteorhacks/simple-rpc-node#readme",
   "dependencies": {
-    "node-int64": "^0.4.0",
-    "protobufjs": "^4.0.0"
+    "node-int64": "0.4.x",
+    "protobufjs": "4.0.x"
   }
 }
