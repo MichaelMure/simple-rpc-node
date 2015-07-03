@@ -45,6 +45,12 @@ Client.prototype.connect = function(callback) {
 };
 
 Client.prototype.call = function(name, payload, callback) {
+  if(!this._connected) {
+    var err = new Error('srpc: not conencted');
+    callback(err);
+    return;
+  }
+
   var id = this._nextId++;
   var req = new proto.Request(id, name, payload);
   var messageBuffer = req.toBuffer();
