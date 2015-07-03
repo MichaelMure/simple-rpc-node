@@ -23,9 +23,12 @@ function Client (address) {
 Client.prototype.connect = function(callback) {
   this._socket.connect(
     this._address.port,
-    this._address.hostname,
-    callback
+    this._address.hostname
   );
+
+  if(callback) {
+    this._socket.once('connect', callback);
+  }
 
   this._socket.on('data', this.__handleData);
   this._socket.on('error', this.__handleError);
@@ -109,7 +112,7 @@ Client.prototype._handleError = function(err) {
   this._socket.removeListener('error', this.__handleError);
 
   setTimeout(function () {
-    self.connect(Function.prototype);
+    self.connect();
   }, this._reconnectTimeout);
 };
 
