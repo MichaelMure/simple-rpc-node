@@ -137,6 +137,15 @@ Client.prototype._onerror = function(err) {
 Client.prototype._onclose = function(err) {
   this._connected = false;
   this.emit('close');
+  var err = new Error('connection lost');
+
+  var calls = this._mcalls;
+  this._mcalls = {};
+
+  for(var id in calls) {
+    callback = calls[id];
+    callback(err);
+  }
 };
 
 Client.prototype._growBuffer = function(size) {
