@@ -3,7 +3,6 @@ var url = require('url');
 var i64 = require('node-int64');
 var util = require('util');
 var events = require('events');
-
 var proto = require('./protocol');
 
 
@@ -16,35 +15,52 @@ function Client (address) {
 
   this._nextId = 0;
   this._mcalls = {};
-
   this._socket = new net.Socket();
-  this._socket.on('data', this._handleData.bind(this));
-  this._socket.on('error', this._handleError.bind(this));
+
+  this.__ondata = this._ondata.bind(this);
+  this.__onerror = this._onerror.bind(this);
+  this.__onclose = this._onclose.bind(this);
 
   this._data = new Buffer(1024*1024);
   this._dataTmp = new Buffer(1024*1024);
   this._dataEnd = 0;
 }
 
-// Client emits: ['error', 'connect']
+// Client emits: ['close', 'connect', 'error']
 util.inherits(Client, events.EventEmitter);
 
-Client.prototype.connect = function() {
+Client.prototype.connect = function(callback) {
   var self = this;
+  callback = callback || Function();
 
-  this._connectCb = function () {
+  function onConnect () {
     self._connected = true;
+    self._socket.removeListener('error', onError);
+    self._socket.on('data', self.__ondata);
+    self._socket.on('error', self.__onerror);
+    self._socket.on('close', self.__onclose);
     self.emit('connect');
-  };
+    callback();
+  }
+
+  function onError (err) {
+    self._socket.removeListener('connect', onConnect);
+    callback(err);
+  }
+
+  self._socket.removeListener('data', self.__ondata);
+  self._socket.removeListener('error', self.__onerror);
+  self._socket.removeListener('close', self.__onclose);
+  this._socket.once('connect', onConnect);
+  this._socket.once('error', onError);
 
   var addr = this._address;
   this._socket.connect(addr.port, addr.hostname);
-  this._socket.once('connect', this._connectCb);
 };
 
 Client.prototype.call = function(name, payload, callback) {
   if(!this._connected) {
-    var err = new Error('srpc: not conencted');
+    var err = new Error('srpc: not connected');
     callback(err);
     return;
   }
@@ -58,7 +74,7 @@ Client.prototype.call = function(name, payload, callback) {
   this._mcalls[id] = callback;
 };
 
-Client.prototype._handleData = function(data) {
+Client.prototype._ondata = function(data) {
   // grow the buffer if we need more space
   var newSize = this._dataEnd + data.length;
   var buffer = this._data;
@@ -91,8 +107,18 @@ Client.prototype._handleData = function(data) {
     }
 
     var messageBuffer = buffer.slice(messageStart, nextOffset);
-    this._handleResponse(proto.Response.decode(messageBuffer));
+    var message = proto.Response.decode(messageBuffer);
     startOffset = nextOffset;
+
+    var err = null;
+    if(message.error !== '') {
+      err = new Error(message.error);
+    }
+
+    var pld = message.payload.toBuffer();
+    var id = new i64(message.id.high, message.id.low).toNumber();
+    var callback = this._getCallback(id);
+    callback(err, pld);
   }
 
   // set remaining data as this._data
@@ -105,27 +131,25 @@ Client.prototype._handleData = function(data) {
   this._dataTmp = tmpBuff;
 };
 
+Client.prototype._onerror = function(err) {
+  this.emit('error', err);
+};
+
+Client.prototype._onclose = function(err) {
+  this._connected = false;
+  this.emit('close');
+};
+
 Client.prototype._growBuffer = function(size) {
   var buff = new Buffer(size);
   this._data.copy(buff);
   this._data = buff;
 };
 
-Client.prototype._handleResponse = function(res) {
-  var err = res.error === '' ? null : new Error(res.error);
-  var pld = res.payload.toBuffer();
-  var id = new i64(res.id.high, res.id.low).toNumber();
+Client.prototype._getCallback = function(id) {
   var callback = this._mcalls[id];
   delete this._mcalls[id];
-  callback(err, pld);
-};
-
-Client.prototype._handleError = function(err) {
-  var self = this;
-  this._connected = false;
-  this._socket.removeListener('connect', this._connectCb);
-
-  this.emit('error', err);
+  return callback || Function();
 };
 
 module.exports = Client;
