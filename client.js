@@ -11,7 +11,6 @@ function Client (address) {
 
   this._address = url.parse(address);
   this._connected = false;
-  this._connectCb = Function();
 
   this._nextId = 0;
   this._mcalls = {};
