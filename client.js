@@ -1,37 +1,47 @@
 var net = require('net');
 var url = require('url');
 var i64 = require('node-int64');
+var util = require('util');
+var events = require('events');
+
 var proto = require('./protocol');
 
 
 function Client (address) {
+  events.EventEmitter.call(this);
+
   this._address = url.parse(address);
-  this._reconnectTimeout = 1000;
+  this._connected = false;
+  this._connectCb = Function();
 
   this._nextId = 0;
   this._mcalls = {};
+
   this._socket = new net.Socket();
+  this._socket.on('data', this._handleData.bind(this));
+  this._socket.on('error', this._handleError.bind(this));
 
   this._data = new Buffer(1024*1024);
   this._dataTmp = new Buffer(1024*1024);
   this._dataEnd = 0;
-
-  this.__handleData = this._handleData.bind(this);
-  this.__handleError = this._handleError.bind(this);
 }
 
+// Client emits: ['error', 'connect']
+util.inherits(Client, events.EventEmitter);
+
 Client.prototype.connect = function(callback) {
-  this._socket.connect(
-    this._address.port,
-    this._address.hostname
-  );
+  var self = this;
 
-  if(callback) {
-    this._socket.once('connect', callback);
-  }
+  callback = callback || Function();
+  this._connectCb = function () {
+    self._connected = true;
+    self.emit('connect');
+    callback();
+  };
 
-  this._socket.on('data', this.__handleData);
-  this._socket.on('error', this.__handleError);
+  var addr = this._address;
+  this._socket.connect(addr.port, addr.hostname);
+  this._socket.once('connect', this._connectCb);
 };
 
 Client.prototype.call = function(name, payload, callback) {
@@ -108,12 +118,10 @@ Client.prototype._handleResponse = function(res) {
 
 Client.prototype._handleError = function(err) {
   var self = this;
-  this._socket.removeListener('data', this.__handleData);
-  this._socket.removeListener('error', this.__handleError);
+  this._connected = false;
+  this._socket.removeListener('connect', this._connectCb);
 
-  setTimeout(function () {
-    self.connect();
-  }, this._reconnectTimeout);
+  this.emit('error', err);
 };
 
 module.exports = Client;
