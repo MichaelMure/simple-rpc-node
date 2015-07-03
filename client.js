@@ -29,14 +29,12 @@ function Client (address) {
 // Client emits: ['error', 'connect']
 util.inherits(Client, events.EventEmitter);
 
-Client.prototype.connect = function(callback) {
+Client.prototype.connect = function() {
   var self = this;
 
-  callback = callback || Function();
   this._connectCb = function () {
     self._connected = true;
     self.emit('connect');
-    callback();
   };
 
   var addr = this._address;
