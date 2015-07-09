@@ -1,6 +1,6 @@
 {
   "name": "simple-rpc",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "A really simple and fast binary RPC middleware",
   "main": "index.js",
   "scripts": {
