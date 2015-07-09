@@ -73,6 +73,11 @@ Client.prototype.call = function(name, payload, callback) {
   this._mcalls[id] = callback;
 };
 
+Client.prototype.close = function() {
+  this._connected = false;
+  this._socket.end();
+};
+
 Client.prototype._ondata = function(data) {
   // grow the buffer if we need more space
   var newSize = this._dataEnd + data.length;
