@@ -1,4 +1,9 @@
+var Session = require('./session');
+var Client = require('./client');
+var Server = require('./server');
+
 module.exports = {
-  Client: require('./client'),
-  Server: require('./server'),
+  Session: Session,
+  Client: Client,
+  Server: Server,
 };

@@ -15,14 +15,13 @@
     "binary",
     "rpc"
   ],
-  "author": "Meteorhacks",
+  "author": "Kadira Inc.",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/meteorhacks/simple-rpc-node/issues"
   },
   "homepage": "https://github.com/meteorhacks/simple-rpc-node#readme",
   "dependencies": {
-    "node-int64": "0.4.x",
     "protobufjs": "4.0.x"
   }
 }
