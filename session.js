@@ -35,7 +35,7 @@ Session.prototype.call = function(name, payload, callback) {
 
   var id = this._nextId++;
   var req = new proto.Request(id, name, payload);
-  var msg = new proto.Message(req, null);
+  var msg = new proto.Message(req);
 
   var messageBuffer = msg.toBuffer();
   var sizeBuffer = new Buffer(4);
@@ -49,11 +49,11 @@ Session.prototype.call = function(name, payload, callback) {
 Session.prototype._ondata = function(data) {
   // grow the buffer if we need more space
   var newSize = this._dataEnd + data.length;
-  var buffer = this._data;
-  if(buffer.length < newSize) {
+  if(this._data.length < newSize) {
     this._growBuffer(newSize);
   }
 
+  var buffer = this._data;
   data.copy(buffer, this._dataEnd);
   this._dataEnd = newSize;
 
