@@ -53,25 +53,24 @@ Session.prototype._ondata = function(data) {
     this._growBuffer(newSize);
   }
 
-  var buffer = this._data;
-  data.copy(buffer, this._dataEnd);
-  this._dataEnd = newSize;
+  data.copy(this._data, this._dataEnd);
+  var buffer = this._data.slice(0, newSize);
 
   var startOffset = 0;
 
   while(true) {
     var messageStart = startOffset+4;
 
-    if(messageStart > this._dataEnd) {
+    if(messageStart > buffer.length) {
       // can't read next message size
       // wait untill next 'data' event
       break;
     }
 
-    var messageSize = buffer.readUInt32LE(0);
+    var messageSize = buffer.readUInt32LE(startOffset);
     var nextOffset = messageStart+messageSize;
 
-    if(nextOffset > this._dataEnd) {
+    if(nextOffset > buffer.length) {
       // can't fully read next message
       // wait until next 'data' event
       break;
@@ -91,8 +90,8 @@ Session.prototype._ondata = function(data) {
   }
 
   // set remaining data as this._data
-  buffer.copy(this._dataTmp, 0, startOffset, this._dataEnd);
-  this._dataEnd = this._dataEnd - startOffset;
+  buffer.copy(this._dataTmp, 0, startOffset);
+  this._dataEnd = buffer.length - startOffset;
 
   // swap buffers
   var tmpBuff = this._data;
