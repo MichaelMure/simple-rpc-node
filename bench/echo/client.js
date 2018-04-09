@@ -1,41 +1,43 @@
-var Client = require('../../').Client;
-var payload = new Buffer(1024);
-var concurrency = 8;
-var address = 'srpc://localhost:12345';
+import { Client } from '../../'
 
-for(var i=0; i<concurrency; ++i) {
-  start();
+const payload = new Buffer(1024)
+const concurrency = 8
+const address = 'srpc://localhost:12345'
+
+for (let i = 0; i < concurrency; ++i) {
+  start()
 }
 
 function start() {
-  var client = new Client(address);
+  const client = new Client(address)
 
-  client.once('error', function (err) {
-    console.error('error: ', err);
-  });
+  client.on('error', err => {
+    console.error('error: ', err)
+  })
 
-  client.once('close', function (errd) {
-    var code = errd ? 1 : 0;
-  });
+  client.once('close', errd => {
+    const code = errd ? 1 : 0
+    console.log('client terminated with code', code)
+  })
 
   client.connect(function (err) {
-    if(err) {
-      console.error('srpc: connect failed:', err);
-      return;
+    if (err) {
+      console.error('srpc: connect failed:', err)
+      return
     }
 
-    echo(client);
-  });
+    echo(client)
+  })
 }
 
 function echo(client) {
   client.call('echo', payload, function (err, res) {
-    if(err) {
-      console.error('method error: ', err);
-    } else if(!payload.equals(res)) {
-      console.error('invalid response');
+    if (err) {
+      console.error('method error: ', err)
+    } else if (!payload.equals(res)) {
+      console.error('invalid response')
     } else {
-      echo(client);
+      echo(client)
     }
-  });
+  })
 }

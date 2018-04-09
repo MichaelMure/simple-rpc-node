@@ -1,9 +1,3 @@
-var Session = require('./session');
-var Client = require('./client');
-var Server = require('./server');
-
-module.exports = {
-  Session: Session,
-  Client: Client,
-  Server: Server,
-};
+export { Session } from './session'
+export { Client } from './client'
+export { Server } from './server'

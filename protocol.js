@@ -1,5 +1,5 @@
-var ProtoBuf = require('protobufjs');
-var path = require('path');
-var fpath = path.join(__dirname, 'protocol.proto');
-var builder = ProtoBuf.loadProtoFile(fpath);
-module.exports = builder.build('srpc');
+const ProtoBuf = require('protobufjs')
+const path = require('path')
+const fpath = path.join(__dirname, 'protocol.proto')
+const builder = ProtoBuf.loadProtoFile(fpath)
+module.exports = builder.build('srpc')

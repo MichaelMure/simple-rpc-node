@@ -4,7 +4,6 @@
   "description": "A really simple and fast binary RPC middleware",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
   },
   "repository": {
     "type": "git",
