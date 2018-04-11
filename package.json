@@ -3,8 +3,7 @@
   "version": "2.0.2",
   "description": "A really simple and fast binary RPC middleware",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meteorhacks/simple-rpc-node.git"
@@ -22,5 +21,10 @@
   "homepage": "https://github.com/meteorhacks/simple-rpc-node#readme",
   "dependencies": {
     "protobufjs": "4.0.x"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
   }
 }

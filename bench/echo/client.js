@@ -1,15 +1,16 @@
 import { Client } from '../../'
 
 const payload = new Buffer(1024)
-const concurrency = 8
-const address = 'srpc://localhost:12345'
+const concurrency = 1 //8
+const port = 12345
+const address = 'localhost'
 
 for (let i = 0; i < concurrency; ++i) {
   start()
 }
 
 function start() {
-  const client = new Client(address)
+  const client = new Client(port, address)
 
   client.on('error', err => {
     console.error('error: ', err)

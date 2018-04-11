@@ -1,8 +1,9 @@
 import { Server } from '../../'
 
-const address = 'srpc://localhost:12345'
+const port = 12345
+const address = 'localhost'
 
-const server = new Server(address)
+const server = new Server(port, address)
 
 server.on('error', err => {
   console.error('error: ', err)
@@ -15,13 +16,16 @@ server.once('close', errd => {
 
 server.listen(err => {
   if (err) {
-    console.error('srpc: listen failed:', err)
+    console.error('Listen failed:', err)
     return
   }
 
+  console.log('new incoming connection handled')
   server.setHandler('echo', handleEcho)
 })
 
-function handleEcho(request) {
+console.log('Starting listening ...')
 
+function handleEcho(request) {
+  console.log('handle echo')
 }

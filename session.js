@@ -19,15 +19,17 @@ export class Session extends EventEmitter {
     this._dataEnd = 0
   }
 
-  static listen(address, callback) {
-    const socket = new net.Socket()
-    socket.listen()
-    const session = new Session(socket)
+  static listen(port, address, callback) {
+    const server = net.createServer(function(socket) {
+      callback(null, new Session(socket))
+    })
 
+    server.on('error', err => callback(err))
 
+    server.listen(port, address)
   }
 
-  static dial(address, callback) {
+  static dial(port, address, callback) {
     const socket = new net.Socket()
     const session = new Session(socket)
 
@@ -43,10 +45,9 @@ export class Session extends EventEmitter {
       callback(err)
     }
 
-    address = url.parse(address)
     socket.once('connect', onConnect)
     socket.once('error', onError)
-    socket.connect(address.port, address.hostname)
+    socket.connect(port, address)
   }
 
   setHandler(name, handler) {
@@ -112,6 +113,8 @@ export class Session extends EventEmitter {
       const message = proto.Message.decode(messageBuffer)
       startOffset = nextOffset
 
+      console.log('new message', message)
+
       if (message.request) {
         this._handleRequest(message.request)
       }
@@ -133,6 +136,7 @@ export class Session extends EventEmitter {
 
   _handleRequest(req) {
     // TODO: implement
+    console.log('handle request')
   }
 
   _handleResponse(res) {

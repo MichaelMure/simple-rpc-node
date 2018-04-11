@@ -1,5 +1,7 @@
-const ProtoBuf = require('protobufjs')
-const path = require('path')
+import ProtoBuf from 'protobufjs'
+import path from 'path'
+
 const fpath = path.join(__dirname, 'protocol.proto')
 const builder = ProtoBuf.loadProtoFile(fpath)
-module.exports = builder.build('srpc')
+
+export default builder.build('srpc')

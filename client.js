@@ -2,8 +2,9 @@ import EventEmitter from 'events'
 import { Session } from './session'
 
 export class Client extends EventEmitter {
-  constructor(address) {
+  constructor(port, address) {
     super()
+    this._port    = port
     this._address = address
     this._session = null
   }
@@ -11,7 +12,7 @@ export class Client extends EventEmitter {
   connect(callback) {
     callback = callback || Function()
 
-    Session.dial(this._address, (err, session) => {
+    Session.dial(this._port, this._address, (err, session) => {
       if (err) {
         callback(err)
         return
@@ -25,6 +26,7 @@ export class Client extends EventEmitter {
   }
 
   call(name, payload, callback) {
+    console.log('call', name)
     this._session.call(name, payload, callback)
   }
 

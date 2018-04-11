@@ -3,14 +3,15 @@ import { Session } from './session'
 
 export class Server extends EventEmitter {
 
-  constructor(address) {
+  constructor(port, address) {
     super()
+    this._port    = port
     this._address = address
     this._session = null
   }
 
   listen(callback) {
-    Session.listen(this._address, (err, session) => {
+    Session.listen(this._port, this._address, (err, session) => {
       if (err) {
         callback(err)
         return
